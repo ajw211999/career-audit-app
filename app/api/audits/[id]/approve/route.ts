@@ -4,7 +4,8 @@ import { generatePDF } from '@/lib/pdf';
 import { sendAuditEmail } from '@/lib/email';
 import type { Audit, ApiResponse } from '@/lib/types';
 
-export const maxDuration = 120;
+// Approve triggers PDF render (Puppeteer) + Resend send. Give it room.
+export const maxDuration = 300;
 
 export async function POST(
   request: NextRequest,

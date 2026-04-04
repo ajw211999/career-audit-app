@@ -4,7 +4,9 @@ import { generateAudit } from '@/lib/claude';
 import { formatIntakeForPrompt } from '@/lib/prompt';
 import type { Audit, ApiResponse } from '@/lib/types';
 
-export const maxDuration = 120;
+// Vercel Pro allows up to 300s. Claude Sonnet 4.5 with an attached resume
+// PDF + up to 8192 output tokens can easily exceed 120s on the $149 tier.
+export const maxDuration = 300;
 
 export async function POST(request: NextRequest) {
   let auditId: string | undefined;
