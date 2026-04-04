@@ -31,7 +31,7 @@ export async function generateAudit({
 
   const message = await client.messages.create({
     model: 'claude-sonnet-4-5',
-    max_tokens: 8192,
+    max_tokens: 16384,
     system: SYSTEM_PROMPT,
     messages: [
       {
