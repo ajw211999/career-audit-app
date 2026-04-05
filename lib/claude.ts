@@ -58,5 +58,54 @@ export async function generateAudit({
 
   const first = message.content[0];
   if (first.type !== 'text') throw new Error('Unexpected response type');
-  return first.text;
+  return sanitizeOutreachPlaceholders(first.text);
+}
+
+/**
+ * Claude Sonnet 4.5 has a very strong prior from training data that outreach
+ * templates use [Name] / [Company] style brackets — strong enough that no
+ * amount of prompt instruction reliably overrides it. This post-processor is
+ * the belt-and-suspenders cleanup that runs after generation:
+ *
+ *   1. Rewrites every known square-bracket recipient variable to the
+ *      {{RECIPIENT FIRST NAME}} / {{RECIPIENT COMPANY}} format Antoine's
+ *      workflow expects.
+ *   2. Strips any "BRACKET AUDIT COMPLETE" self-congratulation line Claude
+ *      sometimes appends (which is also usually a false claim).
+ *
+ * It intentionally does NOT touch unknown bracket patterns — only the ones
+ * we've observed in real outputs — so it can't mangle legitimate content
+ * like the Section 5 Day 6 resume formula.
+ */
+function sanitizeOutreachPlaceholders(text: string): string {
+  let out = text;
+
+  // Recipient name variants — order matters, match most specific first.
+  const nameToken = '{{RECIPIENT FIRST NAME}}';
+  out = out.replace(/\[Recruiter First Name\]/gi, nameToken);
+  out = out.replace(/\[Recruiter Name\]/gi, nameToken);
+  out = out.replace(/\[Recipient First Name\]/gi, nameToken);
+  out = out.replace(/\[Recipient Name\]/gi, nameToken);
+  out = out.replace(/\[First Name\]/gi, nameToken);
+  out = out.replace(/\[Name\]/gi, nameToken);
+
+  // Recipient company variants.
+  const companyToken = '{{RECIPIENT COMPANY}}';
+  out = out.replace(/\[Recipient Company(?: Name)?\]/gi, companyToken);
+  out = out.replace(/\[Company Name\]/gi, companyToken);
+  out = out.replace(/\[their company\]/gi, companyToken);
+  out = out.replace(/\[Company\]/gi, companyToken);
+
+  // Other per-recipient variables that sometimes slip in.
+  out = out.replace(/\[original subject line\]/gi, '{{ORIGINAL SUBJECT LINE}}');
+  out = out.replace(/\[X time\]/gi, '{{TIME AT COMPANY}}');
+
+  // Strip "BRACKET AUDIT COMPLETE" self-congratulation lines. Matches
+  // optional markdown formatting (**, __, #) and any trailing commentary.
+  out = out.replace(/^\s*[*_#]*\s*BRACKET AUDIT[^\n]*$/gim, '');
+
+  // Collapse any triple+ blank lines created by the strip above.
+  out = out.replace(/\n{3,}/g, '\n\n');
+
+  return out.trim();
 }
