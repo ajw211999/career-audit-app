@@ -25,9 +25,16 @@ export async function generateAudit({
 
   const userText = `${formattedIntake}\n\n${tierLabel}\n\nProduce the complete Career Clarity Audit deliverable now. If a resume PDF is attached above, treat it as the authoritative source for work history, titles, dates, and accomplishments — cross-reference it against the intake form and weave specific details from the resume into your positioning recommendations.`;
 
+  // Strip any whitespace/newlines that may have crept into the base64 string
+  // during copy-paste or manual SQL inserts. Anthropic rejects base64 with
+  // any whitespace as an invalid_request_error.
+  const cleanedResumeBase64 = resumeBase64
+    ? resumeBase64.replace(/\s/g, '')
+    : null;
+
   // Only PDF resumes can be passed as a Claude document block.
   // Non-PDFs (docx, etc.) fall through and Claude uses intake text only.
-  const hasPdfResume = !!resumeBase64 && resumeMimeType === 'application/pdf';
+  const hasPdfResume = !!cleanedResumeBase64 && resumeMimeType === 'application/pdf';
 
   const message = await client.messages.create({
     model: 'claude-sonnet-4-5',
