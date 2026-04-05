@@ -31,7 +31,10 @@ export async function generateAudit({
 
   const message = await client.messages.create({
     model: 'claude-sonnet-4-5',
-    max_tokens: 16384,
+    // 12288 fits the $149 tier's 11 sections (~10-11k tokens observed) with
+    // headroom, and keeps total runtime well under the 300s Vercel ceiling.
+    // 16384 was pushing right up against the timeout.
+    max_tokens: 12288,
     system: SYSTEM_PROMPT,
     messages: [
       {
