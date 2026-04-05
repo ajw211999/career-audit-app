@@ -29,11 +29,21 @@ export async function generatePDF(
     },
   });
 
+  const monthYear = new Date().toLocaleDateString('en-US', {
+    month: 'long',
+    year: 'numeric',
+  });
+
+  const safeName = sanitizeHtml(clientName, { allowedTags: [] });
+
   const tierLabel =
     tier === '149'
       ? 'Career Clarity Audit + Strategic Exit Plan'
       : 'Career Clarity Audit';
 
+  // Template modeled on Antoine's existing manual deliverable format —
+  // plain title block at top, clean serif body, title-case headers without
+  // the UPPERCASE/letter-spacing treatment, footer repeating the byline.
   const html = `
     <!DOCTYPE html>
     <html>
@@ -42,88 +52,117 @@ export async function generatePDF(
       <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-          font-family: 'Georgia', serif;
+          font-family: Georgia, 'Times New Roman', serif;
           font-size: 11pt;
-          line-height: 1.7;
+          line-height: 1.65;
           color: #1a1a1a;
-          padding: 60px;
-          max-width: 800px;
-          margin: 0 auto;
+          padding: 64px 72px 56px 72px;
         }
-        .header {
-          border-bottom: 3px solid #1a1a1a;
-          padding-bottom: 20px;
-          margin-bottom: 32px;
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-end;
+
+        /* Cover block */
+        .cover {
+          text-align: center;
+          margin-bottom: 40px;
+          padding-bottom: 24px;
+          border-bottom: 2px solid #1a1a1a;
         }
-        .brand {
-          font-size: 9pt;
-          letter-spacing: 2px;
+        .cover-title {
+          font-size: 16pt;
+          font-weight: 700;
+          letter-spacing: 3px;
           text-transform: uppercase;
-          color: #666;
+          margin-bottom: 14px;
         }
-        .client-info h1 {
+        .cover-name {
           font-size: 22pt;
           font-weight: 700;
-          letter-spacing: -0.5px;
+          letter-spacing: -0.3px;
+          margin-bottom: 10px;
         }
-        .client-info p {
+        .cover-byline {
           font-size: 10pt;
           color: #555;
-          margin-top: 4px;
+          font-style: italic;
+        }
+
+        /* Body typography */
+        h1 {
+          font-size: 16pt;
+          font-weight: 700;
+          margin: 36px 0 14px;
         }
         h2 {
           font-size: 14pt;
           font-weight: 700;
-          margin: 28px 0 12px;
-          padding-bottom: 6px;
-          border-bottom: 1px solid #e0e0e0;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
+          margin: 32px 0 12px;
         }
         h3 {
           font-size: 12pt;
           font-weight: 700;
-          margin: 20px 0 8px;
+          margin: 22px 0 10px;
         }
-        p { margin-bottom: 12px; }
+        h4 {
+          font-size: 11pt;
+          font-weight: 700;
+          margin: 18px 0 8px;
+        }
+
+        p { margin-bottom: 11px; }
         ul, ol {
-          margin: 8px 0 16px 20px;
+          margin: 6px 0 14px 22px;
         }
-        li { margin-bottom: 6px; }
+        li { margin-bottom: 5px; }
+
         strong { font-weight: 700; }
+        em { font-style: italic; }
+
         blockquote {
           background: #f8f8f8;
-          border-left: 4px solid #1a1a1a;
-          padding: 14px 18px;
-          margin: 16px 0;
+          border-left: 3px solid #1a1a1a;
+          padding: 12px 16px;
+          margin: 14px 0;
           font-style: italic;
         }
+
+        hr {
+          border: none;
+          border-top: 1px solid #d0d0d0;
+          margin: 28px 0;
+        }
+
+        code {
+          background: #f4f4f4;
+          padding: 2px 6px;
+          border-radius: 2px;
+          font-family: 'Menlo', 'Courier New', monospace;
+          font-size: 10pt;
+        }
+
         table {
           width: 100%;
           border-collapse: collapse;
-          margin: 16px 0;
+          margin: 14px 0;
           font-size: 10pt;
         }
         th {
-          background: #1a1a1a;
-          color: white;
+          background: #f4f4f4;
+          color: #1a1a1a;
           padding: 8px 12px;
           text-align: left;
+          border-bottom: 2px solid #1a1a1a;
         }
         td { padding: 8px 12px; border-bottom: 1px solid #e0e0e0; }
-        tr:nth-child(even) td { background: #f9f9f9; }
+
         .footer {
-          margin-top: 60px;
-          padding-top: 16px;
-          border-top: 1px solid #e0e0e0;
+          margin-top: 48px;
+          padding-top: 14px;
+          border-top: 1px solid #d0d0d0;
           font-size: 9pt;
-          color: #999;
-          display: flex;
-          justify-content: space-between;
+          color: #666;
+          text-align: center;
+          font-style: italic;
         }
+
         @page {
           margin: 0;
           size: letter;
@@ -131,12 +170,10 @@ export async function generatePDF(
       </style>
     </head>
     <body>
-      <div class="header">
-        <div class="client-info">
-          <h1>${sanitizeHtml(clientName, { allowedTags: [] })}</h1>
-          <p>${tierLabel} &nbsp;|&nbsp; Prepared by Antoine Wade &nbsp;|&nbsp; NxtGen Heights</p>
-        </div>
-        <div class="brand">NxtGen Heights</div>
+      <div class="cover">
+        <div class="cover-title">${tierLabel}</div>
+        <div class="cover-name">${safeName}</div>
+        <div class="cover-byline">Prepared by NxtGen Heights with Antoine Wade &nbsp;&middot;&nbsp; ${monthYear}</div>
       </div>
 
       <div class="content">
@@ -144,8 +181,7 @@ export async function generatePDF(
       </div>
 
       <div class="footer">
-        <span>Confidential — prepared exclusively for ${sanitizeHtml(clientName, { allowedTags: [] })}</span>
-        <span>nxtgenheights.com</span>
+        Career Clarity Audit &nbsp;&middot;&nbsp; ${safeName} &nbsp;&middot;&nbsp; Prepared by NxtGen Heights with Antoine Wade &nbsp;&middot;&nbsp; ${monthYear}
       </div>
     </body>
     </html>

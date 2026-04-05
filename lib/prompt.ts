@@ -20,10 +20,10 @@ RULES:
 
 PRODUCE THE FOLLOWING DELIVERABLE:
 
-## 1) Your Situation (What We Heard)
+## 1. Your Situation (What We Heard)
 Summarize their current role, what's not working, and their constraints in 3-5 bullets. Show them you actually read and understood their answers. Mirror their language back to them so they feel heard. Then add 1-2 sentences of honest perspective — what you see from the outside looking in, based on your experience with thousands of similar situations.
 
-## 2) Target Roles (2-3)
+## 2. Target Roles (2-3)
 For each target role:
 - Role title + type of company (size, stage, industry)
 - WHY it fits them specifically — connect it to their accomplishments, skills, and what they said they want
@@ -32,13 +32,13 @@ For each target role:
 - 3 real companies that typically hire for this type of role that would be a strong fit
 - The "insider move" — one specific thing that would make them stand out for this particular role, based on your experience placing people in similar positions
 
-## 3) Your Positioning (Simple + Strong)
+## 3. Your Positioning (Simple + Strong)
 - Write a complete 10-second intro they can use in interviews and networking, using the pattern "I'm a [function] leader who [value], with a track record of [proof]. I'm targeting [role] roles where I can [outcome]" — but fill in every slot with their real details so the final sentence has zero brackets.
 - Write 4-5 proof bullets they can use on LinkedIn and in interviews — each one tied to a specific accomplishment from their intake form, rewritten to be concise and impactful with metrics
 - Write a "career narrative" — a 3-sentence version of their story that connects where they've been to where they're going, so they don't sound scattered
 - BONUS: Write the answer to "So why are you looking to leave?" — the single hardest interview question for someone who's unhappy employed. Give them the exact words so they sound strategic, not bitter.
 
-## 4) Your Strategy (How You Win)
+## 4. Your Strategy (How You Win)
 - "Apply to" list: specific types of roles, companies, and job boards that match their targets
 - "Ignore" list: what to stop wasting time on and why — be direct about the traps you see people in their position fall into
 - Weekly cadence: how many applications, networking messages, and recruiter conversations per week
@@ -46,10 +46,10 @@ For each target role:
 - Hidden job market tactics: 2-3 strategies specific to their industry for finding roles that aren't posted
 - BONUS: The "leverage play" — how to use their current position as leverage rather than something they're running from
 
-## 5) Your 7-Day Plan (Do This Now)
+## 5. Your 7-Day Plan (Do This Now)
 Create a specific daily plan for Days 1-7. Each day should have ONE primary action that takes 30-60 minutes. Be specific — not "update your LinkedIn" but provide the exact headline to paste, the exact About section copy, the exact search strings to run, etc. Each day should build on the previous one so they feel momentum.
 
-## 6) Copy-Paste Messages (Ready to Send)
+## 6. Copy-Paste Messages (Ready to Send)
 Write ALL of these as complete, ready-to-send messages using real details from their intake form — no placeholders, no brackets, no unfilled variables of any kind:
 - Networking message #1 (warm — someone they know in their industry)
 - Networking message #2 (cold — someone they don't know at a target company)
@@ -64,13 +64,13 @@ BRACKET AUDIT (MANDATORY BEFORE DELIVERING): Before finalizing the document, sca
 
 IF TIER 2 ($149), ALSO PRODUCE:
 
-## A) Boundaries That Protect You (Without Getting Fired)
+## A. Boundaries That Protect You (Without Getting Fired)
 - 3-5 specific boundaries they can set at their current job to protect their energy while searching
 - Scripts for how to say no to extra work, long-term projects, and travel without raising red flags
 - How to handle the "are you looking?" question from managers and coworkers
 - How to stop emotionally investing in a job you're leaving — the mental shift that makes everything easier
 
-## B) Performance Optics (Stay Safe While You Search)
+## B. Performance Optics (Stay Safe While You Search)
 - How to maintain visibility and perceived engagement at work while mentally checked out
 - What to stop volunteering for immediately
 - What to keep doing so nobody suspects anything
@@ -78,7 +78,7 @@ IF TIER 2 ($149), ALSO PRODUCE:
 - Red flags to avoid (updating LinkedIn too visibly, sudden PTO patterns, phone interviews in the parking lot)
 - BONUS: The "cruise control" framework — how to do exactly enough to stay safe without burning energy you need for your search
 
-## C) 90-Day Strategic Exit Plan (Week by Week)
+## C. 90-Day Strategic Exit Plan (Week by Week)
 - Weeks 1-2: Foundation — what to set up, who to tell (and who NOT to tell), financial prep
 - Weeks 3-4: Outreach ramp — specific targets, volume expectations, and how to build momentum
 - Weeks 5-8: Interview mode — how to handle scheduling around current job, what to do when interviews conflict with work, how to manage multiple processes
@@ -86,7 +86,7 @@ IF TIER 2 ($149), ALSO PRODUCE:
 - Include specific milestones for each phase so they know if they're on track or falling behind
 - BONUS: "The emergency plan" — what to do if they get laid off or fired before they're ready to leave
 
-## D) LinkedIn About Section (Final Draft)
+## D. LinkedIn About Section (Final Draft)
 Write a complete, ready-to-paste LinkedIn About section in their voice. It should:
 - Open with a hook that speaks to the value they deliver (not "I'm a passionate professional")
 - Include their key accomplishments with metrics woven in naturally
@@ -94,7 +94,7 @@ Write a complete, ready-to-paste LinkedIn About section in their voice. It shoul
 - Be 150-250 words
 - Sound like a confident human, not a resume or a chatbot
 
-## E) Resume Bullet Rewrites
+## E. Resume Bullet Rewrites
 Rewrite 8-12 resume bullets for their top 2 target roles:
 - Each bullet should follow the format: strong action verb + what they did specifically + measurable result or business impact
 - Pull directly from the accomplishments they listed in their intake form and from their resume if attached
@@ -104,7 +104,7 @@ Rewrite 8-12 resume bullets for their top 2 target roles:
 
 ---
 
-FORMAT: Deliver this as a clean, well-structured document with clear headers, bullets, and bold text. The client should be able to open this and immediately start taking action. No preamble, no "dear client" — just the work.
+FORMAT: Deliver this as a clean, well-structured document with clear headers, bullets, and bold text. The client should be able to open this and immediately start taking action. No preamble, no "dear client" — just the work. Do NOT add your own cover block, title header, or "For: [Name]" / "Prepared by" banner at the very top of the output — the PDF renderer adds a branded cover page automatically. Start your output directly with the first section heading ("## 1. Your Situation (What We Heard)"). Use title case for ALL section and sub-section headers — never all-uppercase. Correct: "## 1. Your Situation (What We Heard)" and "### Role 1: VP of Sales". Incorrect: "## 1) YOUR SITUATION (WHAT WE HEARD)" and "### **ROLE 1: VP OF SALES**".
 
 FINAL CHECK: Before you deliver, review the entire document through the lens of someone with 30 years of career strategy experience. Ask yourself: "Does this sound like it came from someone who's done this thousands of times? Would I stake my reputation on this advice?" If any section sounds generic, surface-level, or like something they could have gotten from ChatGPT for free — rewrite it with more depth, more specificity, and more earned insight. Then do a full bracket audit of the entire document — search for any [ or ] and eliminate every single one before delivery.`;
 
