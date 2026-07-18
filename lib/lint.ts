@@ -37,8 +37,19 @@ const BANNED_PATTERNS: Array<{ re: RegExp; label: string }> = [
 ];
 
 export function lintReport(text: string): LintResult {
+  // The crisis reviewer note is internal (stripped before the customer PDF)
+  // and its bracketed header is intentional — lint only what the customer
+  // could ever see, or every crisis report burns a pointless regeneration.
+  let scrubbed = text;
+  const noteIdx = scrubbed.indexOf('[REVIEWER NOTE FOR ANTOINE');
+  if (noteIdx !== -1) {
+    const sectionIdx = scrubbed.indexOf('## ', noteIdx);
+    scrubbed =
+      scrubbed.slice(0, Math.max(0, scrubbed.lastIndexOf('**', noteIdx))) +
+      (sectionIdx !== -1 ? scrubbed.slice(sectionIdx) : '');
+  }
   // The single permitted token.
-  const scrubbed = text.replaceAll('{{UPSELL_CODE}}', '');
+  scrubbed = scrubbed.replaceAll('{{UPSELL_CODE}}', '');
   const violations: string[] = [];
   for (const { re, label } of BANNED_PATTERNS) {
     re.lastIndex = 0;
