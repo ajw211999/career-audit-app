@@ -6,6 +6,39 @@ import StatusBadge from './StatusBadge';
 import ApproveButton from './ApproveButton';
 import type { Audit, AuditStatus } from '@/lib/types';
 
+function RequestMoreInfoButton({
+  auditId,
+  onDone,
+}: {
+  auditId: string;
+  onDone: () => void;
+}) {
+  const [busy, setBusy] = useState(false);
+  return (
+    <button
+      disabled={busy}
+      onClick={async () => {
+        if (
+          !confirm(
+            'Reopen the intake and email the client asking for more specific answers? The current report will not be sent.'
+          )
+        )
+          return;
+        setBusy(true);
+        try {
+          await fetch(`/api/audits/${auditId}/needs-info`, { method: 'POST' });
+          onDone();
+        } finally {
+          setBusy(false);
+        }
+      }}
+      className="rounded-lg border border-purple-300 px-4 py-2 text-sm font-medium text-purple-700 hover:bg-purple-50 disabled:opacity-50"
+    >
+      {busy ? 'Sending…' : 'Request More Info'}
+    </button>
+  );
+}
+
 export default function AuditDetail({ auditId }: { auditId: string }) {
   const [audit, setAudit] = useState<Audit | null>(null);
   const [loading, setLoading] = useState(true);
@@ -31,9 +64,9 @@ export default function AuditDetail({ auditId }: { auditId: string }) {
 
   useEffect(() => {
     fetchAudit();
-    // Poll while processing
+    // Poll while generation is queued or running
     const interval = setInterval(() => {
-      if (audit?.status === 'processing') {
+      if (audit?.status === 'processing' || audit?.status === 'submitted') {
         fetchAudit();
       }
     }, 5000);
@@ -105,12 +138,22 @@ export default function AuditDetail({ auditId }: { auditId: string }) {
           <div>
             <h1 className="text-xl font-semibold text-gray-900">{audit.client_name}</h1>
             <div className="mt-1 flex items-center gap-2">
-              <span className="text-sm text-gray-500">${audit.tier} tier</span>
+              <span className="text-sm text-gray-500">
+                {audit.tier === 'snapshot' ? 'Snapshot ($39)' : `$${audit.tier} tier`}
+              </span>
               <StatusBadge status={audit.status} />
+              {audit.crisis_flag && (
+                <span className="inline-flex items-center rounded-full bg-red-600 px-2.5 py-0.5 text-xs font-semibold text-white">
+                  Crisis flag — read the reviewer note
+                </span>
+              )}
             </div>
           </div>
         </div>
         <div className="flex items-center gap-3">
+          {audit.tier === 'snapshot' && audit.status === 'pending_review' && (
+            <RequestMoreInfoButton auditId={audit.id} onDone={fetchAudit} />
+          )}
           {audit.status === 'pending_review' && editedContent !== audit.audit_content && (
             <button
               onClick={handleSave}

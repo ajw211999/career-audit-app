@@ -1,6 +1,12 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy so importing this module never requires the key (Next's build-time
+// page-data collection imports API routes with no env configured).
+let _resend: Resend | null = null;
+function resendClient(): Resend {
+  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY);
+  return _resend;
+}
 
 interface SendAuditEmailParams {
   clientName: string;
@@ -51,7 +57,7 @@ Antoine Wade
 NxtGen Heights
 nxtgenheights.com`;
 
-  await resend.emails.send({
+  await resendClient().emails.send({
     from: `${process.env.RESEND_FROM_NAME} <${process.env.RESEND_FROM_EMAIL}>`,
     to: clientEmail,
     subject: `Your Career Clarity Audit is ready, ${firstName}`,

@@ -76,13 +76,24 @@ export default function ApproveButton({
     );
   }
 
-  if (status === 'processing') {
+  if (status === 'processing' || status === 'submitted') {
     return (
       <button
         disabled
         className="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-500 cursor-not-allowed"
       >
-        Generating...
+        {status === 'submitted' ? 'Queued...' : 'Generating...'}
+      </button>
+    );
+  }
+
+  if (status === 'draft' || status === 'needs_info') {
+    return (
+      <button
+        disabled
+        className="rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-500 cursor-not-allowed"
+      >
+        Waiting on client intake
       </button>
     );
   }
