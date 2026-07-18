@@ -37,7 +37,7 @@ export async function generatePDF(
   const safeName = sanitizeHtml(clientName, { allowedTags: [] });
 
   const tierLabel =
-    tier === '149'
+    tier === '497'
       ? 'Career Clarity Audit + Strategic Exit Plan'
       : 'Career Clarity Audit';
 

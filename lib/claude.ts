@@ -19,9 +19,9 @@ export async function generateAudit({
   resumeMimeType,
 }: GenerateAuditParams): Promise<string> {
   const tierLabel =
-    tier === '149'
-      ? 'TIER PURCHASED: $149 (Full Audit + Exit Plan)'
-      : 'TIER PURCHASED: $79 (Career Clarity Audit)';
+    tier === '497'
+      ? 'TIER PURCHASED: $497 (Full Audit + Exit Plan)'
+      : 'TIER PURCHASED: $197 (Career Clarity Audit)';
 
   const userText = `${formattedIntake}\n\n${tierLabel}\n\nProduce the complete Career Clarity Audit deliverable now. If a resume PDF is attached above, treat it as the authoritative source for work history, titles, dates, and accomplishments — cross-reference it against the intake form and weave specific details from the resume into your positioning recommendations.`;
 
@@ -37,8 +37,10 @@ export async function generateAudit({
   const hasPdfResume = !!cleanedResumeBase64 && resumeMimeType === 'application/pdf';
 
   const message = await client.messages.create({
-    model: 'claude-sonnet-4-5',
-    // 12288 fits the $149 tier's 11 sections (~10-11k tokens observed) with
+    // Opus 4.8: thinking stays off (no `thinking` param) to hold the same
+    // latency envelope — the 300s Vercel ceiling is the binding constraint.
+    model: 'claude-opus-4-8',
+    // 12288 fits the $497 tier's 11 sections (~10-11k tokens observed) with
     // headroom, and keeps total runtime well under the 300s Vercel ceiling.
     // 16384 was pushing right up against the timeout.
     max_tokens: 12288,
@@ -69,7 +71,7 @@ export async function generateAudit({
 }
 
 /**
- * Claude Sonnet 4.5 has a very strong prior from training data that outreach
+ * Claude has a very strong prior from training data that outreach
  * templates use [Name] / [Company] style brackets — strong enough that no
  * amount of prompt instruction reliably overrides it. This post-processor is
  * the belt-and-suspenders cleanup that runs after generation:

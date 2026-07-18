@@ -11,7 +11,7 @@ create table if not exists audits (
   client_email text not null,
 
   -- Product
-  tier   text not null check (tier in ('79','149')),
+  tier   text not null check (tier in ('197','497')),
   status text not null default 'processing'
     check (status in ('processing','pending_review','approved','sent','error')),
 

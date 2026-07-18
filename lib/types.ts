@@ -1,6 +1,6 @@
 export type AuditStatus = 'processing' | 'pending_review' | 'approved' | 'sent' | 'error';
 
-export type AuditTier = '79' | '149';
+export type AuditTier = '197' | '497';
 
 export interface Audit {
   id: string;

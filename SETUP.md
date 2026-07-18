@@ -8,7 +8,7 @@ checkpoint so you know it worked before moving on.
 ## 0. Prereqs (one-time)
 
 - [ ] A **Supabase** account (free tier is fine)
-- [ ] An **Anthropic** API key with access to `claude-sonnet-4-5`
+- [ ] An **Anthropic** API key with access to `claude-opus-4-8`
 - [ ] A **Resend** account with `nxtgenheights.com` domain verified
 - [ ] A **Vercel** account connected to this repo
 - [ ] Your existing **Google Form** for intake (already live)
@@ -40,8 +40,12 @@ Script and this app. Example:
 openssl rand -hex 32
 ```
 
-Save it somewhere. It will become `WEBHOOK_SECRET` in both .env.local AND in
-the Apps Script file.
+Save it somewhere. It will become `WEBHOOK_SECRET` in the Vercel env vars AND
+be pasted into the Apps Script editor.
+
+> ⚠️ A previous secret was committed to this repo's git history (this repo is
+> public). Treat that value as burned — always generate a fresh secret at
+> deploy time, and never commit it back into `scripts/google-apps-script.js`.
 
 ---
 
@@ -126,13 +130,14 @@ If all 7 pass: you're live. Announce on the next Daily Climb.
   payload. Vercel serverless functions cap request body at 4.5 MB on Hobby and
   50 MB on Pro. Typical resume PDFs are <1 MB, but warn customers against
   uploading 10-page portfolios.
-- **Model ID.** `lib/claude.ts` uses `claude-sonnet-4-5`. If Anthropic
+- **Model ID.** `lib/claude.ts` uses `claude-opus-4-8`. If Anthropic
   deprecates it, update that single line.
 - **Tier is self-reported.** The form field "Which did you purchase?" is the
-  only tier signal. A customer who paid $79 could technically pick $149 on the
+  only tier signal. A customer who paid $197 could technically pick $497 on the
   form. Low risk at current volume; when it matters, add a Kajabi purchase
   webhook that writes authoritative tier to a `purchases` table and have
-  `/api/intake` join on email.
+  `/api/intake` join on email. (The Kajabi purchase webhook already runs on the
+  EC2 box — kajabi-webhook.service — so the authoritative feed exists.)
 - **Human-in-the-loop.** Every audit currently requires you to click
   Approve + Send. Keep it this way until you've reviewed ~25 drafts with
   minor edits on 90% of them — only then consider auto-send.

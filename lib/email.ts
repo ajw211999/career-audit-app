@@ -17,20 +17,20 @@ export async function sendAuditEmail({
 }: SendAuditEmailParams) {
   const firstName = clientName.split(' ')[0];
   const tierLabel =
-    tier === '149'
+    tier === '497'
       ? 'Career Clarity Audit + Strategic Exit Plan'
       : 'Career Clarity Audit';
   const pdfFilename = `${clientName.replace(/\s+/g, '-')}-${tierLabel.replace(/\s+/g, '-')}.pdf`;
 
   const emailBody =
-    tier === '149'
+    tier === '497'
       ? `${firstName},
 
 Your full Career Clarity Audit + Strategic Exit Plan is attached.
 
 Start with Section 5 — the 7-Day Plan. It's sequenced for a reason and Day 1 takes less than 45 minutes.
 
-The copy-paste messages in Section 6 are ready to send. The only thing in brackets is the recipient's first name.
+The copy-paste messages in Section 6 are ready to send. Just fill in each recipient's name where marked.
 
 If anything in the document needs clarification or you want to talk through a specific section, reply here.
 
@@ -43,7 +43,7 @@ Your Career Clarity Audit is attached.
 
 Start with Section 5 — the 7-Day Plan. Day 1 takes less than 45 minutes and builds momentum for everything that follows.
 
-The copy-paste messages in Section 6 are ready to send. The only thing in brackets is the recipient's first name.
+The copy-paste messages in Section 6 are ready to send. Just fill in each recipient's name where marked.
 
 If anything needs clarification, reply here.
 

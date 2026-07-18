@@ -24,8 +24,14 @@ export async function POST(request: NextRequest) {
 
     // Extract key fields from form data
     const clientName = formData['Full name'] || formData['Name'] || 'Unknown';
-    const clientEmail = formData['Email address'] || formData['Email'] || '';
-    const tier = formData['Which did you purchase?']?.includes('149') ? '149' : '79';
+    // Google's auto-collected email column is "Email Address" on newer forms
+    // and "Email address" on older ones — match any key containing "email".
+    const emailKey = Object.keys(formData).find((k) =>
+      k.toLowerCase().includes('email')
+    );
+    const clientEmail = (emailKey && formData[emailKey]) || '';
+    // Form options are "Career Clarity Audit ($197)" / "Audit + Exit Plan ($497)"
+    const tier = formData['Which did you purchase?']?.includes('497') ? '497' : '197';
 
     // Dedup: skip if same email submitted within last 10 minutes
     const tenMinAgo = new Date(Date.now() - 10 * 60 * 1000).toISOString();

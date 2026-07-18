@@ -16,6 +16,18 @@ RULES:
 - Go beyond what's promised: add insights they didn't ask for but clearly need based on their situation. This is where your 30 years of pattern recognition matters — call out blind spots, hidden strengths, and opportunities they haven't considered.
 - If you see a red flag in their thinking (unrealistic expectations, targeting the wrong roles, undervaluing themselves), say it directly but constructively. That honesty is what makes this worth paying for.
 
+DEEP INTAKE SIGNALS — the intake form includes several questions that go beyond logistics. These answers are where the audit earns its price. Use every one of them; never let one go unaddressed:
+- PERFECT FIRST HOUR (what their ideal work morning looks like): use it to pressure-test the target roles in Section 2 — if a proposed role's daily reality doesn't match their described first hour, say so and adjust. Weave its language into the positioning intro.
+- QUIETLY CONSIDERED ROLE (the role they haven't told anyone about): address it head-on in Section 2. Either validate it as a legitimate target with a path, or explain honestly why it's a detour — with your reasoning. Ignoring this answer is the single fastest way to make the audit feel generic.
+- LAST SEARCH ATTEMPT AND WHY IT FAILED: diagnose the real reason it failed (which is often not the reason they gave) and make sure Section 4's strategy visibly does not repeat it.
+- WHAT MAKES THIS A 10/10: treat this as the client's stated success criterion. Make sure the deliverable explicitly provides that one thing, and make it easy to find.
+- CAREER ROLE MODEL: use the person they named in Section 3's career narrative — what specifically about that trajectory maps to the client's next move.
+- TIME ACTIVELY SEARCHING: if 6-12 months or 12+ months, add a clearly-labeled "Long Search Reset" passage in Section 1: the market past 45 does not reward more applications, it rewards sharper targeting — their search stalling is a positioning problem, not an effort problem. Then bias Section 4 toward hidden-market and network tactics over application volume.
+- URGENCY (1-10): calibrate the 7-day plan to it. At 8-10, compress timelines and lead with the fastest-payoff actions; at 1-3, favor foundation-building.
+- BIGGEST FEAR: name it and address it directly and honestly somewhere in the deliverable. Do not dismiss it; give them the strategic answer to it.
+
+SAFEGUARDING: if the intake answers signal acute personal crisis — hopelessness, references to self-harm, complete financial desperation beyond a normal job search — begin your output with a clearly-marked block: "**[REVIEWER NOTE FOR ANTOINE — DELETE BEFORE SENDING]**" followed by one short paragraph explaining what you saw and suggesting a personal touch (a direct email or call) instead of a standard delivery. Then produce the audit as normal below it. Use this only for genuine signals, not ordinary career anxiety.
+
 ---
 
 PRODUCE THE FOLLOWING DELIVERABLE:
@@ -62,7 +74,7 @@ BRACKET AUDIT (MANDATORY BEFORE DELIVERING): Before finalizing the document, sca
 
 ---
 
-IF TIER 2 ($149), ALSO PRODUCE:
+IF TIER 2 ($497), ALSO PRODUCE:
 
 ## A. Boundaries That Protect You (Without Getting Fired)
 - 3-5 specific boundaries they can set at their current job to protect their energy while searching
@@ -108,36 +120,63 @@ FORMAT: Deliver this as a clean, well-structured document with clear headers, bu
 
 FINAL CHECK: Before you deliver, review the entire document through the lens of someone with 30 years of career strategy experience. Ask yourself: "Does this sound like it came from someone who's done this thousands of times? Would I stake my reputation on this advice?" If any section sounds generic, surface-level, or like something they could have gotten from ChatGPT for free — rewrite it with more depth, more specificity, and more earned insight. Then do a full bracket audit of the entire document — search for any [ or ] and eliminate every single one before delivery.`;
 
+// Normalize a form question for lookup: lowercase, strip punctuation
+// (typographic apostrophes, en/em dashes, question marks) and collapse
+// whitespace. Google Forms question text drifts in exactly these ways, so
+// exact-string matching against sheet headers is too brittle.
+function normalizeKey(key: string): string {
+  return key
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+// Keyed by normalized question text — matches the intake form as of July 2026.
+// Unmapped questions still reach Claude via the uppercase-key fallback below,
+// so a form edit degrades labels, never data.
+const FIELD_MAPPINGS: Record<string, string> = {
+  'which did you purchase': 'TIER PURCHASED',
+  'full name': 'FULL NAME',
+  'email address': 'EMAIL',
+  'linkedin profile url': 'LINKEDIN URL',
+  'current location and time zone': 'LOCATION / TIME ZONE',
+  'current title': 'CURRENT TITLE',
+  'company name': 'COMPANY',
+  'industry': 'INDUSTRY',
+  'how long have you been in your current role': 'TIME IN ROLE',
+  'current total compensation rough range is fine': 'CURRENT COMPENSATION',
+  'work setup': 'WORK SETUP',
+  'what s driving you to leave': 'REASONS FOR LEAVING',
+  'describe what s wrong in 3 5 specific bullets': 'WHAT IS NOT WORKING',
+  'what does success look like for you 12 months from now': '12-MONTH SUCCESS PICTURE',
+  'target compensation': 'TARGET COMPENSATION',
+  'target industries up to 3': 'TARGET INDUSTRIES',
+  'hard constraints': 'HARD CONSTRAINTS',
+  'do you already know the 1 3 roles you re targeting': 'KNOWS TARGET ROLES',
+  'list up to 3 target roles': 'TARGET ROLES',
+  'what kind of work do you want to do next': 'WORK INTERESTS',
+  'list 5 8 accomplishments with numbers': 'KEY ACCOMPLISHMENTS',
+  'your top skills tools and certifications': 'TOP SKILLS, TOOLS, AND CERTIFICATIONS',
+  'if you woke up 12 months from now in your perfect role what does the first hour of your work day look like':
+    'PERFECT FIRST HOUR',
+  'what s a role you ve been quietly considering but haven t told anyone about':
+    'QUIETLY CONSIDERED ROLE',
+  'what did you try last in your job search and why do you think it didn t work':
+    'LAST SEARCH ATTEMPT AND WHY IT FAILED',
+  'what would make this audit a 10 10 for you what s the one thing it has to deliver':
+    'WHAT MAKES THIS A 10/10',
+  'who in your industry do you most respect and what specifically about their career do you want to model':
+    'CAREER ROLE MODEL',
+  'how long have you been actively job searching': 'TIME ACTIVELY SEARCHING',
+  'urgency': 'URGENCY (1-10)',
+  'what s your biggest fear about making this move': 'BIGGEST FEAR',
+  'anything else i should know that hasn t been asked': 'ADDITIONAL CONTEXT',
+};
+
 export function formatIntakeForPrompt(
   formData: Record<string, string>,
   hasAttachedResume?: boolean
 ): string {
-  const fieldMappings: Record<string, string> = {
-    'Which did you purchase?': 'TIER PURCHASED',
-    'Full name': 'FULL NAME',
-    'Email address': 'EMAIL',
-    'LinkedIn profile URL': 'LINKEDIN URL',
-    'Current location + time zone': 'LOCATION',
-    'Current title': 'CURRENT TITLE',
-    'Company / industry': 'COMPANY / INDUSTRY',
-    'How long in your current role?': 'TIME IN ROLE',
-    'Current comp (rough range is fine)': 'CURRENT COMPENSATION',
-    'Work setup': 'WORK SETUP',
-    "What's driving you to leave?": 'REASONS FOR LEAVING',
-    "Describe what's wrong in 3–5 bullets": 'WHAT IS NOT WORKING',
-    'What do you want next?': 'WHAT THEY WANT NEXT',
-    'Target comp': 'TARGET COMPENSATION',
-    'Target industries': 'TARGET INDUSTRIES',
-    'Hard constraints (location, travel, schedule, remote-only, etc.)': 'HARD CONSTRAINTS',
-    "If you already know, list up to 3 roles you're targeting": 'TARGET ROLES',
-    "If you don't know, what kind of work do you want to do?": 'WORK INTERESTS',
-    'List 5–8 accomplishments (bullets; numbers if possible)': 'KEY ACCOMPLISHMENTS',
-    'Your top skills/tools': 'TOP SKILLS AND TOOLS',
-    'Anything else you want me to know?': 'ADDITIONAL CONTEXT',
-    'How urgently do you need to make a change?': 'URGENCY (1-10)',
-    "What's your biggest fear about making a move?": 'BIGGEST FEAR',
-  };
-
   let formatted = 'CLIENT INTAKE FORM RESPONSES:\n\n';
 
   if (hasAttachedResume) {
@@ -145,8 +184,17 @@ export function formatIntakeForPrompt(
   }
 
   Object.entries(formData).forEach(([key, value]) => {
-    if (!value || key === 'Timestamp' || key.toLowerCase().includes('upload')) return;
-    const label = fieldMappings[key] || key.toUpperCase();
+    if (!value) return;
+    const normalized = normalizeKey(key);
+    // Skip non-content fields: timestamps, the resume upload URL, and the
+    // testimonial-consent question (irrelevant to audit generation).
+    if (
+      normalized === 'timestamp' ||
+      normalized.includes('upload') ||
+      normalized.includes('testimonial')
+    )
+      return;
+    const label = FIELD_MAPPINGS[normalized] || key.toUpperCase();
     formatted += `${label}:\n${value}\n\n`;
   });
 

@@ -6,8 +6,12 @@
 // instructions in the commit that added this file). Without it, the .docx → PDF
 // conversion will fail and non-PDF resumes will not be passed to Claude.
 
+// SECURITY: never commit the real secret to this file — this repo is public.
+// Paste the real value only into the Apps Script editor (it lives in Google's
+// script storage, not in git). The previous committed secret is burned;
+// generate a fresh one (openssl rand -hex 32) before deploying.
 const WEBHOOK_URL = 'https://career-audit-app.vercel.app/api/intake';
-const WEBHOOK_SECRET = '1a7738759187669db7bfd8f87cc83f969363cd4ee84de0e28590f81b3f643907';
+const WEBHOOK_SECRET = 'PASTE_YOUR_WEBHOOK_SECRET_HERE';
 
 function onFormSubmit(e) {
   try {
