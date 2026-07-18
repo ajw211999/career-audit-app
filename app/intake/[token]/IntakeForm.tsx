@@ -19,11 +19,14 @@ export default function IntakeForm({
   firstName,
   initialAnswers,
   needsInfo,
+  preview = false,
 }: {
   token: string;
   firstName: string;
   initialAnswers: Record<string, string>;
   needsInfo: boolean;
+  /** Render-only mode for /preview/intake: no autosave or submit calls. */
+  preview?: boolean;
 }) {
   const [answers, setAnswers] = useState<Record<string, string>>(initialAnswers);
   const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
@@ -35,6 +38,11 @@ export default function IntakeForm({
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const flush = useCallback(async () => {
+    if (preview) {
+      dirtyRef.current = {};
+      setSaveState('saved');
+      return;
+    }
     const dirty = dirtyRef.current;
     if (Object.keys(dirty).length === 0) return;
     dirtyRef.current = {};
@@ -102,6 +110,11 @@ export default function IntakeForm({
   async function submit() {
     setSubmitError(null);
     if (!validate()) return;
+    if (preview) {
+      setSubmitted(true);
+      window.scrollTo({ top: 0 });
+      return;
+    }
     setSubmitting(true);
     try {
       await flush();
