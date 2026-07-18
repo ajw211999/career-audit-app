@@ -1,5 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { SYSTEM_PROMPT } from './prompt';
+import { SNAPSHOT_SYSTEM_PROMPT } from './snapshot-prompt';
 
 const client = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -68,6 +69,36 @@ export async function generateAudit({
   const first = message.content[0];
   if (first.type !== 'text') throw new Error('Unexpected response type');
   return sanitizeOutreachPlaceholders(first.text);
+}
+
+interface GenerateSnapshotParams {
+  formattedIntake: string;
+  /** Lint feedback from a failed first pass, if this is the retry. */
+  voiceFeedback?: string;
+}
+
+export async function generateSnapshot({
+  formattedIntake,
+  voiceFeedback,
+}: GenerateSnapshotParams): Promise<string> {
+  const userText = `${formattedIntake}\n\nProduce the complete Career Clarity Snapshot deliverable now.${
+    voiceFeedback
+      ? `\n\nIMPORTANT REVISION NOTE: a previous draft failed the voice check for: ${voiceFeedback}. Follow the voice rules exactly this time.`
+      : ''
+  }`;
+
+  const message = await client.messages.create({
+    // Same latency reasoning as the audit tier: thinking off, and the
+    // Snapshot's ~2,400-word ceiling fits far inside 8192 output tokens.
+    model: 'claude-opus-4-8',
+    max_tokens: 8192,
+    system: SNAPSHOT_SYSTEM_PROMPT,
+    messages: [{ role: 'user', content: userText }],
+  });
+
+  const first = message.content[0];
+  if (first.type !== 'text') throw new Error('Unexpected response type');
+  return first.text.trim();
 }
 
 /**

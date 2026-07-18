@@ -3,6 +3,18 @@
 import type { AuditStatus } from '@/lib/types';
 
 const statusConfig: Record<AuditStatus, { label: string; className: string }> = {
+  draft: {
+    label: 'Awaiting Intake',
+    className: 'bg-gray-100 text-gray-500',
+  },
+  submitted: {
+    label: 'Queued',
+    className: 'bg-gray-100 text-gray-700',
+  },
+  needs_info: {
+    label: 'More Info Requested',
+    className: 'bg-purple-100 text-purple-800',
+  },
   processing: {
     label: 'Processing',
     className: 'bg-gray-100 text-gray-700',

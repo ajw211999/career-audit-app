@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { waitUntil } from '@vercel/functions';
 import { createClient } from '@/lib/supabase';
+import { triggerGeneration } from '@/lib/trigger-generation';
 import type { ApiResponse } from '@/lib/types';
+
+// The after() callback awaits generation (same ceiling as /api/generate).
+export const maxDuration = 300;
 
 export async function POST(request: NextRequest) {
   try {
@@ -40,7 +45,8 @@ export async function POST(request: NextRequest) {
       .select('id')
       .eq('client_email', clientEmail)
       .gte('created_at', tenMinAgo)
-      .single();
+      .limit(1)
+      .maybeSingle();
 
     if (existing) {
       return NextResponse.json<ApiResponse<null>>({ success: true });
@@ -53,7 +59,11 @@ export async function POST(request: NextRequest) {
         client_name: clientName,
         client_email: clientEmail,
         tier,
-        status: 'processing',
+        // 'submitted' = waiting for generation. /api/generate atomically
+        // claims submitted -> processing; the sweeper re-triggers any row
+        // stuck here, so a lost trigger is recoverable instead of terminal.
+        status: 'submitted',
+        submitted_at: new Date().toISOString(),
         intake_json: formData,
         resume_url: resumeUrl || null,
         resume_file_base64: resumeFileBase64 || null,
@@ -65,15 +75,15 @@ export async function POST(request: NextRequest) {
 
     if (insertError) throw insertError;
 
-    // Fire-and-forget: trigger generation as separate serverless invocation
-    fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/generate`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        auditId: audit.id,
-        secret: process.env.WEBHOOK_SECRET,
-      }),
-    });
+    // Trigger generation without blocking the response. A bare fire-and-forget
+    // fetch dies when Vercel freezes the lambda on return; waitUntil() keeps
+    // the invocation alive until generation finishes, and the sweeper cron
+    // re-triggers the row if this invocation dies anyway.
+    waitUntil(
+      triggerGeneration(audit.id).catch((e) =>
+        console.error('generation trigger failed:', e)
+      )
+    );
 
     return NextResponse.json<ApiResponse<{ auditId: string }>>({
       success: true,

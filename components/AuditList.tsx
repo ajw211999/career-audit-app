@@ -107,8 +107,13 @@ export default function AuditList() {
                   <td className="px-4 py-3 text-sm text-gray-600">{audit.client_email}</td>
                   <td className="px-4 py-3">
                     <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700">
-                      ${audit.tier}
+                      {audit.tier === 'snapshot' ? 'Snapshot' : `$${audit.tier}`}
                     </span>
+                    {audit.crisis_flag && (
+                      <span className="ml-1 inline-flex items-center rounded-full bg-red-600 px-2 py-0.5 text-xs font-semibold text-white">
+                        Crisis
+                      </span>
+                    )}
                   </td>
                   <td className="px-4 py-3">
                     <StatusBadge status={audit.status} />
