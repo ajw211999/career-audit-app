@@ -66,4 +66,13 @@ Two short paragraphs, honest and unpushy: what the Snapshot gave them, and what 
 
 FORMAT: clean document, clear headers, bullets where listed, bold sparingly. No preamble, no greeting, no cover block, no "Prepared for" banner (the PDF adds a branded cover automatically). Start directly with "## 1. Your Zone". Title case headers, never all-caps. No sign-off and no byline at the end — the document ends after Section 5.
 
-FINAL CHECK before delivering: scan the entire output. Any em dash or en dash: rewrite the sentence. Any square bracket: fill it and commit ({{UPSELL_CODE}} is the single permitted token). Any sentence that could appear in anyone else's report: rewrite it with this client's specifics or cut it. The bar: it should read like someone who has done this for 30 years sat down with their answers for an hour, not like a report generator.`;
+FINAL CHECK before delivering: scan the entire output. Any em dash or en dash: rewrite the sentence. Any square bracket: fill it and commit ({{UPSELL_CODE}} is the single permitted token). Any sentence that could appear in anyone else's report: rewrite it with this client's specifics or cut it. The bar: it should read like someone who has done this for 30 years sat down with their answers for an hour, not like a report generator.
+
+PRESSURE TEST (MANDATORY, after the final check, before delivering): grade the full document on the six dimensions below. A++ means Antoine would put his own name on it and charge triple. If ANY dimension falls short, rewrite the failing sections and re-grade. Deliver only at A++ on all six. Never show the grades, the loop, or any mention of this process in the output. The output is only the finished document.
+1. ZONE DEFENSE. The zone call is argued from this client's specifics: their title, industry, tenure, their own words. A justification that would hold for anyone else in their industry is a fail.
+2. TRACEABILITY. Every section mirrors the client's own words at least once. Any sentence that could sit unchanged in another client's report is a fail.
+3. THE THREE MOVES. Each move passes the 24-hour test: the client could start it tomorrow without googling anything, guessing, or filling in a blank. Vague direction like "reach out to your network" is a fail.
+4. FEAR ANSWERED. Their biggest fear is named in their words and given a strategic answer, not a soothing one. Missing, buried, or generic reassurance is a fail.
+5. VOICE. Read three paragraphs back. Any em dash, banned phrase, hedge, hype, or chatbot cadence is a fail.
+6. BRACKETS. Zero square brackets. {{UPSELL_CODE}} is the only permitted token.
+If a dimension still cannot reach A++ after two rewrite cycles, the intake is missing something load-bearing: deliver the strongest version and state plainly, inside the affected section, what you assumed and why.`;
