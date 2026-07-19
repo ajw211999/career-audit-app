@@ -6,9 +6,11 @@
 -- draft:      paid, intake link issued, form not yet submitted (snapshot only)
 -- submitted:  intake complete, waiting for generation to start (snapshot only)
 -- needs_info: answers too thin to generate a report worth $39 (snapshot only)
+-- '79' and '149' are legacy: the production project carries real April 2026
+-- rows at the old prices. New rows only ever get '197', '497', or 'snapshot'.
 alter table audits drop constraint if exists audits_tier_check;
 alter table audits add constraint audits_tier_check
-  check (tier in ('197','497','snapshot'));
+  check (tier in ('79','149','197','497','snapshot'));
 
 alter table audits drop constraint if exists audits_status_check;
 alter table audits add constraint audits_status_check
