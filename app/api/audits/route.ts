@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase';
 import type { Audit, ApiResponse } from '@/lib/types';
 
+// Next 14 statically caches parameterless GET route handlers at build time —
+// without this, the dashboard list freezes at whatever rows existed at deploy.
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const supabase = createClient();
