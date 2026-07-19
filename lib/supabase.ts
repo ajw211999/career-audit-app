@@ -8,5 +8,13 @@ export function createClient() {
     throw new Error('Missing Supabase environment variables');
   }
 
-  return createSupabaseClient(supabaseUrl, supabaseKey);
+  // Next 14 patches global fetch with a persistent data cache that survives
+  // deployments — a cached Supabase read means stale rows in every route that
+  // selects (dashboard list, approve, sweep CAS reads). Database reads must
+  // never be cached.
+  return createSupabaseClient(supabaseUrl, supabaseKey, {
+    global: {
+      fetch: (url, options = {}) => fetch(url, { ...options, cache: 'no-store' }),
+    },
+  });
 }
