@@ -64,5 +64,24 @@ export function lintReport(text: string): LintResult {
   if (strayTokens) {
     violations.push(`unexpected template token: ${strayTokens[0]}`);
   }
+
+  // The upsell code must arrive as the token, never as prose. Observed live
+  // 2026-07-26: a report skipped {{UPSELL_CODE}} and invented "UPSELL2024",
+  // which substitution cannot fix, so the customer would have been handed a
+  // dead discount code and the ascension path would die silently. Two rules,
+  // because either failure alone is enough to break it.
+  const tokenCount = (text.match(/\{\{UPSELL_CODE\}\}/g) || []).length;
+  if (tokenCount !== 1) {
+    violations.push(
+      `{{UPSELL_CODE}} must appear exactly once (found ${tokenCount})`
+    );
+  }
+  // A code-shaped string anywhere near the discount is an invented code.
+  const invented = scrubbed.match(
+    /\b(?:code|coupon)\b[^.\n]{0,40}\b([A-Z][A-Z0-9]{4,})\b/g
+  );
+  if (invented) {
+    violations.push(`invented discount code: ${invented[0].trim()}`);
+  }
   return { clean: violations.length === 0, violations };
 }

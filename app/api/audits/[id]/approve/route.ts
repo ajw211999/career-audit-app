@@ -106,6 +106,29 @@ export async function POST(
       ? prepareCustomerContent(storedContent)
       : storedContent;
 
+    // The report must carry the REAL upsell code. A generation that skipped
+    // {{UPSELL_CODE}} and wrote its own code substitutes into nothing, so the
+    // customer gets a dead discount (observed live 2026-07-26: "UPSELL2024").
+    // Lint catches it first; this is the gate that holds when lint is bypassed
+    // by a hand-edited report from the dashboard.
+    const upsellCode = process.env.UPSELL_COUPON_CODE || 'SNAPSHOT39';
+    if (isSnapshot && !customerContent.includes(upsellCode)) {
+      console.error(`Approve aborted for ${id}: upsell code ${upsellCode} missing.`);
+      await supabase
+        .from('audits')
+        .update({ status: 'pending_review', approved_at: null })
+        .eq('id', id);
+      return NextResponse.json<ApiResponse<null>>(
+        {
+          success: false,
+          error:
+            `Report does not contain the upsell code ${upsellCode} and was not sent. ` +
+            `The generation likely invented its own code. Regenerate it.`,
+        },
+        { status: 422 }
+      );
+    }
+
     // Never email a gutted report: if stripping internal blocks ate the
     // document, fail loudly and hand the row back for review.
     if (
