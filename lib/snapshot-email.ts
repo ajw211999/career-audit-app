@@ -26,13 +26,29 @@ export function intakeLinkUrl(token: string): string {
   return `${appUrl()}/intake/${token}`;
 }
 
+/**
+ * A name we can safely greet, or "there".
+ *
+ * Kajabi's real payment.succeeded payload carries member.id and member.email
+ * and NO name (verified on the first live paid purchase, 2026-07-26), so the
+ * webhook falls back to storing the email as client_name. Splitting that on a
+ * space yields the whole address, and the buyer's first contact after paying
+ * opens "antoine.wade@blkheights.com,". Comped purchases hid this because
+ * reconciliation resolves a real name from Kajabi's /customers record.
+ */
+function greetingName(clientName: string): string {
+  const first = (clientName || '').trim().split(' ')[0];
+  if (!first || first.includes('@')) return 'there';
+  return first;
+}
+
 /** Sent by the webhook (and /start resend): here is your intake link. */
 export async function sendIntakeLinkEmail(params: {
   clientName: string;
   clientEmail: string;
   token: string;
 }) {
-  const firstName = params.clientName.split(' ')[0] || 'there';
+  const firstName = greetingName(params.clientName);
   await resendClient().emails.send({
     from: FROM(),
     to: params.clientEmail,
@@ -62,7 +78,7 @@ export async function sendSubmissionConfirmationEmail(params: {
   clientName: string;
   clientEmail: string;
 }) {
-  const firstName = params.clientName.split(' ')[0] || 'there';
+  const firstName = greetingName(params.clientName);
   await resendClient().emails.send({
     from: FROM(),
     to: params.clientEmail,
@@ -87,7 +103,7 @@ export async function sendNeedsInfoEmail(params: {
   token: string;
   thinQuestionLabels: string[];
 }) {
-  const firstName = params.clientName.split(' ')[0] || 'there';
+  const firstName = greetingName(params.clientName);
   const list = params.thinQuestionLabels.map((l) => `- ${l}`).join('\n');
   await resendClient().emails.send({
     from: FROM(),
@@ -119,7 +135,7 @@ export async function sendIntakeReminderEmail(params: {
   token: string;
   daysSincePurchase: number;
 }) {
-  const firstName = params.clientName.split(' ')[0] || 'there';
+  const firstName = greetingName(params.clientName);
   await resendClient().emails.send({
     from: FROM(),
     to: params.clientEmail,
@@ -143,18 +159,36 @@ Antoine`,
   });
 }
 
+/**
+ * Attachment filename. client_name can be an email address (see
+ * greetingName), and "antoine.wade@blkheights.com-Career-Clarity-Snapshot.pdf"
+ * is both ugly in an inbox and a filename some mail clients mangle.
+ */
+function pdfFilename(clientName: string): string {
+  const safe = (clientName || '')
+    .replace(/@.*$/, '')
+    .replace(/[^A-Za-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+  return safe
+    ? `${safe}-Career-Clarity-Snapshot.pdf`
+    : 'Career-Clarity-Snapshot.pdf';
+}
+
 /** The finished report. Signed by Antoine; no claim of a per-report human review. */
 export async function sendSnapshotReportEmail(params: {
   clientName: string;
   clientEmail: string;
   pdfBuffer: Buffer;
 }) {
-  const firstName = params.clientName.split(' ')[0] || 'there';
+  const firstName = greetingName(params.clientName);
   await resendClient().emails.send({
     from: FROM(),
     to: params.clientEmail,
     replyTo: REPLY_TO(),
-    subject: `Your Career Clarity Snapshot is ready, ${firstName}`,
+    subject:
+      firstName === 'there'
+        ? 'Your Career Clarity Snapshot is ready'
+        : `Your Career Clarity Snapshot is ready, ${firstName}`,
     text: `${firstName},
 
 Your Career Clarity Snapshot is attached.
@@ -170,7 +204,7 @@ If anything is unclear, just reply to this email.
 Antoine`,
     attachments: [
       {
-        filename: `${params.clientName.replace(/\s+/g, '-')}-Career-Clarity-Snapshot.pdf`,
+        filename: pdfFilename(params.clientName),
         content: params.pdfBuffer,
       },
     ],

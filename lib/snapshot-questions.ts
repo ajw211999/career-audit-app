@@ -9,6 +9,21 @@ import type { SnapshotQuestion } from './types';
 
 export const SNAPSHOT_QUESTIONS: SnapshotQuestion[] = [
   // ── Section 1: Where you are now ──────────────────────────────────
+  // Kajabi's real payment.succeeded payload carries member.id and
+  // member.email and NO name (verified on the first live paid purchase,
+  // 2026-07-26), so the webhook stores the email as client_name and every
+  // paying buyer would be greeted by their own email address. Asking here is
+  // the fix. Note the file header rule still holds: the delivery EMAIL never
+  // comes from this form, because that would let a leaked intake link
+  // redirect someone's report. A name redirects nothing.
+  {
+    id: 'first_name',
+    section: 'Where you are now',
+    label: 'What should I call you?',
+    type: 'text',
+    required: true,
+    placeholder: 'Example: Marcus',
+  },
   {
     id: 'current_title',
     section: 'Where you are now',
@@ -194,11 +209,17 @@ export function findThinAnswers(
   });
 }
 
+// Asked for addressing the buyer (greeting, PDF cover), not for the analysis.
+// Feeding it to the model would quietly change the report's voice, since it
+// would start using their name in copy that was signed off without one.
+const PROMPT_EXCLUDED_QUESTION_IDS = new Set(['first_name']);
+
 /** Format the snapshot answers for the generation prompt. */
 export function formatSnapshotIntake(answers: Record<string, string>): string {
   const lines: string[] = ['CLIENT INTAKE (Career Clarity Snapshot):', ''];
   let currentSection = '';
   for (const q of SNAPSHOT_QUESTIONS) {
+    if (PROMPT_EXCLUDED_QUESTION_IDS.has(q.id)) continue;
     if (q.section !== currentSection) {
       currentSection = q.section;
       lines.push(`## ${currentSection}`);

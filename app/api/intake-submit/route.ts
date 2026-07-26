@@ -93,6 +93,16 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // Adopt the name they gave us, but only over a placeholder. The webhook
+  // stores the buyer's email as client_name when Kajabi sends no name, and
+  // reconciliation stores a real name when it can resolve one from
+  // /customers. Overwrite the former, never the latter.
+  const givenName = (merged.first_name || '').trim().slice(0, 80);
+  const storedIsPlaceholder =
+    !row.client_name || row.client_name.includes('@');
+  const clientName =
+    givenName && storedIsPlaceholder ? givenName : row.client_name;
+
   // Atomic transition: only one submit wins, double-clicks and replays no-op.
   const { data: updated, error } = await supabase
     .from('audits')
@@ -100,6 +110,7 @@ export async function POST(request: NextRequest) {
       intake_json: merged,
       status: 'submitted',
       submitted_at: new Date().toISOString(),
+      ...(clientName !== row.client_name ? { client_name: clientName } : {}),
     })
     .eq('id', row.id)
     .in('status', ['draft', 'needs_info'])
@@ -122,7 +133,7 @@ export async function POST(request: NextRequest) {
     (async () => {
       try {
         await sendSubmissionConfirmationEmail({
-          clientName: row.client_name,
+          clientName,
           clientEmail: row.client_email,
         });
       } catch (e) {
