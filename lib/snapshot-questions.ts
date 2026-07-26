@@ -83,7 +83,14 @@ export const SNAPSHOT_QUESTIONS: SnapshotQuestion[] = [
       'Burned out',
       'My industry or role feels at risk',
       'Bad manager or toxic culture',
-      'Laid off or expecting a layoff',
+      // Split 2026-07-26 from a single "Laid off or expecting a layoff".
+      // Both force the Yellow zone, so the split is not about the verdict:
+      // one option covering two states forced every report to hedge with
+      // "you are either laid off or expecting it", which reads like it did
+      // not read the buyer's answers. Legacy rows still carry the old
+      // combined string and the prompt still recognises it.
+      'I have been laid off',
+      'I expect a layoff',
       'I want work that means something',
       'Ready for a bigger challenge',
     ],
