@@ -131,11 +131,11 @@ export async function POST(
 
     // Never email a gutted report: if stripping internal blocks ate the
     // document, fail loudly and hand the row back for review.
-    if (
-      isSnapshot &&
-      (customerContent.length < 1200 ||
-        !customerContent.includes('## 1. Your Zone'))
-    ) {
+    // Order-agnostic: the Zone section is the load-bearing one, but its
+    // position has moved once already (it was Section 1 until 2026-07-26),
+    // and a hard-coded heading silently turns this guard off the next time.
+    const hasZoneSection = /^##\s*\d+\.\s*Your Zone\b/m.test(customerContent);
+    if (isSnapshot && (customerContent.length < 1200 || !hasZoneSection)) {
       console.error(
         `Approve aborted for ${id}: stripped content looks incomplete ` +
           `(${customerContent.length} chars of ${storedContent.length}).`

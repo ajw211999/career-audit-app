@@ -159,7 +159,7 @@ export async function sendSnapshotReportEmail(params: {
 
 Your Career Clarity Snapshot is attached.
 
-Read Section 1 first. Your zone sets the clock for everything else.
+Read Section 2 first. Your zone sets the clock for everything else.
 
 Then go straight to Section 4 and put the first move on your calendar for this week. The Snapshot only works if the moves happen.
 
