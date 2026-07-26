@@ -201,6 +201,8 @@ It was built from your answers on my Career Clarity Audit framework.
 
 If anything is unclear, just reply to this email.
 
+One more thing. If this report did not earn its $39, reply within seven days and I will send your money back. No form and no questions, and the report stays yours either way.
+
 Antoine`,
     attachments: [
       {
