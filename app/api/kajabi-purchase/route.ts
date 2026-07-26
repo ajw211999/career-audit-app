@@ -61,23 +61,85 @@ export async function POST(request: NextRequest) {
   const txnId = txn.id != null ? `kajabi-txn-${String(txn.id)}` : null;
   const supabase = createClient();
 
-  // Idempotency: same transaction already seen -> resend that row's link.
+  // A duplicate delivery re-sends the buyer's existing link, which is the
+  // right answer for a Kajabi retry hours later. It is the wrong answer for
+  // two events firing on the same purchase seconds apart, where the first
+  // delivery already emailed them. So only resend once the row has had time
+  // to be missed.
+  const RESEND_AFTER_MS = 10 * 60 * 1000;
+  type ExistingRow = {
+    id: string;
+    intake_token: string;
+    client_name: string;
+    client_email: string;
+    status: string;
+    created_at: string;
+  };
+  const resendIfStale = async (row: ExistingRow) => {
+    if (row.status !== 'draft') return false;
+    const age = Date.now() - new Date(row.created_at).getTime();
+    if (age < RESEND_AFTER_MS) return false;
+    await sendIntakeLinkEmail({
+      clientName: row.client_name,
+      clientEmail: row.client_email,
+      token: row.intake_token,
+    });
+    return true;
+  };
+  const COLS =
+    'id, intake_token, client_name, client_email, status, created_at, kajabi_transaction_id';
+
+  // Idempotency, first pass: this exact transaction has been seen before.
   if (txnId) {
     const { data: existing } = await supabase
       .from('audits')
-      .select('id, intake_token, client_name, client_email, status')
+      .select(COLS)
       .eq('kajabi_transaction_id', txnId)
       .maybeSingle();
     if (existing?.intake_token) {
-      if (existing.status === 'draft') {
-        await sendIntakeLinkEmail({
-          clientName: existing.client_name,
-          clientEmail: existing.client_email,
-          token: existing.intake_token,
-        });
-      }
-      return NextResponse.json({ success: true, duplicate: true });
+      const resent = await resendIfStale(existing as ExistingRow);
+      return NextResponse.json({ success: true, duplicate: true, resent });
     }
+  }
+
+  // Idempotency, second pass: same purchase arriving as a different event.
+  // Kajabi can be wired to deliver both payment.succeeded and an order/cart
+  // event, and order-shaped payloads carry no payment transaction. A null
+  // transaction id slips past the UNIQUE constraint every time, so without
+  // this a single purchase mints one row per event, with an intake link and a
+  // generated report for each.
+  //
+  // Match only a row this buyer has not started filling in, inside a short
+  // window. Someone genuinely buying a second Snapshot later still gets their
+  // own row, because the window is short and started rows never match.
+  const windowStart = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const { data: sameBuyer } = await supabase
+    .from('audits')
+    .select(COLS)
+    .eq('tier', 'snapshot')
+    .eq('client_email', email)
+    .eq('status', 'draft')
+    .is('submitted_at', null)
+    .gte('created_at', windowStart)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (sameBuyer?.intake_token) {
+    // Backfill the id so later retries take the cheap first-pass route.
+    if (txnId && !sameBuyer.kajabi_transaction_id) {
+      await supabase
+        .from('audits')
+        .update({ kajabi_transaction_id: txnId })
+        .eq('id', sameBuyer.id);
+    }
+    const resent = await resendIfStale(sameBuyer as ExistingRow);
+    return NextResponse.json({
+      success: true,
+      duplicate: true,
+      matchedBy: 'same-buyer-window',
+      resent,
+    });
   }
 
   const { data: created, error } = await supabase
