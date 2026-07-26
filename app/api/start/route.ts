@@ -75,6 +75,6 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({
     success: true,
     message:
-      'If that email has a Career Clarity Snapshot purchase, your intake link is on its way to it now. Purchases can take up to an hour to sync after checkout. Nothing after an hour? Reply to any of our emails and a human will sort it out.',
+      'If that email has a Career Clarity Snapshot purchase, your intake link is on its way to it now. Purchases can take a few minutes to sync after checkout. Nothing after 30 minutes? Reply to any of our emails and a human will sort it out.',
   });
 }
