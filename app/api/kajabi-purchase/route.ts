@@ -49,12 +49,40 @@ export async function POST(request: NextRequest) {
   const email = String(member.email ?? '').trim().toLowerCase();
   const name = String(member.name ?? '').trim();
 
+  // Structural trace, no PII. Every ignore path below returns 200 by design
+  // (Kajabi kills a hook that errors), so a payload whose shape we did not
+  // expect is indistinguishable from a purchase of somebody else's offer:
+  // silent, correct-looking, and it strands a buyer who has paid. This line
+  // is what turns that into a diagnosis. Keys and booleans only.
+  console.log(
+    'kajabi-purchase payload:',
+    JSON.stringify({
+      event: body.event ?? null,
+      topLevelKeys: Object.keys(body),
+      offerKeys: Object.keys(offer),
+      memberKeys: Object.keys(member),
+      txnKeys: Object.keys(txn),
+      offerId: offerId || null,
+      offerMatches: offerId === process.env.KAJABI_SNAPSHOT_OFFER_ID,
+      hasEmail: !!email,
+      hasTxnId: txn.id != null,
+    })
+  );
+
   // Only the Snapshot offer creates rows here; every other offer's purchase
   // is someone else's pipeline. Return 200 so Kajabi never marks us dead.
   if (offerId !== process.env.KAJABI_SNAPSHOT_OFFER_ID) {
     return NextResponse.json({ success: true, ignored: true });
   }
   if (!email) {
+    // Shape mismatch, not a foreign offer: the offer id matched, so this IS a
+    // Snapshot purchase we failed to read. Loud, because recon is the only
+    // thing standing between this and a buyer who paid and heard nothing.
+    console.error(
+      'kajabi-purchase: Snapshot offer matched but no member email could be ' +
+        `read. Member keys: ${JSON.stringify(Object.keys(member))}. ` +
+        'Recon will recover this buyer within ~10 minutes.'
+    );
     return NextResponse.json({ success: true, ignored: true });
   }
 
