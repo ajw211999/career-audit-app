@@ -173,7 +173,7 @@ export async function generatePDF(
       <div class="cover">
         <div class="cover-title">${tierLabel}</div>
         <div class="cover-name">${safeName}</div>
-        <div class="cover-byline">Prepared by NxtGen Heights with Antoine Wade &nbsp;&middot;&nbsp; ${monthYear}</div>
+        <div class="cover-byline">Prepared by Antoine Wade &nbsp;&middot;&nbsp; ${monthYear}</div>
       </div>
 
       <div class="content">
@@ -181,7 +181,7 @@ export async function generatePDF(
       </div>
 
       <div class="footer">
-        Career Clarity Audit &nbsp;&middot;&nbsp; ${safeName} &nbsp;&middot;&nbsp; Prepared by NxtGen Heights with Antoine Wade &nbsp;&middot;&nbsp; ${monthYear}
+        Career Clarity Audit &nbsp;&middot;&nbsp; ${safeName} &nbsp;&middot;&nbsp; Prepared by Antoine Wade &nbsp;&middot;&nbsp; ${monthYear}
       </div>
     </body>
     </html>

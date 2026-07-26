@@ -40,7 +40,7 @@ export default async function IntakePage({
         <p className="mt-4 leading-relaxed">
           {row.status === 'sent'
             ? 'Your Career Clarity Snapshot has been delivered. Check the inbox you used at checkout, and the spam folder if it is not there.'
-            : 'Your Career Clarity Snapshot is being built and gets a human review before it goes out. Expect it in your inbox today.'}
+            : 'Your Career Clarity Snapshot is being built. It is usually in your inbox within a day.'}
         </p>
         <p className="mt-4 text-sm text-gray-500">
           Need something? Reply to any of our emails.

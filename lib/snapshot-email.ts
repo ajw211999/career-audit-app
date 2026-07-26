@@ -11,7 +11,10 @@ function resendClient(): Resend {
 // Every customer email: plain text, plain voice, reply-to goes to the
 // monitored support inbox so "I never got my link" lands somewhere a human
 // (or Marcus's daily sweep) actually reads, not a noreply void.
-// All copy below is customer-facing — Antoine signs off before launch.
+// All copy below is customer-facing and signed off by Antoine (07-26). Two
+// rules to keep: it is Antoine's own voice, first person, signed "Antoine";
+// and nothing claims he personally read or reviewed an individual report, so
+// the copy stays true when the approve gate flips to auto-send.
 
 const FROM = () =>
   `${process.env.RESEND_FROM_NAME} <${process.env.RESEND_FROM_EMAIL}>`;
@@ -46,11 +49,11 @@ ${intakeLinkUrl(params.token)}
 
 You can stop halfway and come back. Same link.
 
-Once you submit, your Snapshot is delivered the same day.
+Once you submit, your Snapshot is usually in your inbox within a day.
 
 Questions? Just reply to this email.
 
-NxtGen Heights`,
+Antoine`,
   });
 }
 
@@ -69,11 +72,11 @@ export async function sendSubmissionConfirmationEmail(params: {
 
 Your answers are in and your Career Clarity Snapshot is being built now.
 
-It gets a human review before it goes out, so expect it in your inbox today.
+Your report is usually in your inbox within a day.
 
 Questions? Just reply to this email.
 
-NxtGen Heights`,
+Antoine`,
   });
 }
 
@@ -93,7 +96,7 @@ export async function sendNeedsInfoEmail(params: {
     subject: 'One more pass and your Snapshot will be worth it',
     text: `${firstName},
 
-I looked at your answers before building your Snapshot, and I want to be straight with you: a few of them are too short to give you anything better than generic advice, and generic advice is not what you paid for.
+Before your Snapshot gets built, I want to be straight with you: a few of your answers are too short to give you anything better than generic advice, and generic advice is not what you paid for.
 
 Worth another minute or two each:
 ${list}
@@ -103,9 +106,9 @@ Specifics are what make this work. One real number beats three adjectives.
 Your answers are saved. Pick it back up here:
 ${intakeLinkUrl(params.token)}
 
-Resubmit and your Snapshot is delivered the same day.
+Resubmit and your Snapshot is usually in your inbox within a day.
 
-NxtGen Heights`,
+Antoine`,
   });
 }
 
@@ -134,15 +137,13 @@ You bought the Career Clarity Snapshot${
 Pick it up here (your answers so far are saved):
 ${intakeLinkUrl(params.token)}
 
-Submit today and the report is in your inbox today.
+Submit today and your report is usually in your inbox within a day.
 
-If something went wrong or you want a refund instead, just reply and say so.
-
-NxtGen Heights`,
+Antoine`,
   });
 }
 
-/** The finished report. Framing is transparent: framework + review, no personal byline. */
+/** The finished report. Signed by Antoine; no claim of a per-report human review. */
 export async function sendSnapshotReportEmail(params: {
   clientName: string;
   clientEmail: string;
@@ -162,11 +163,11 @@ Read Section 1 first. Your zone sets the clock for everything else.
 
 Then go straight to Section 4 and put the first move on your calendar for this week. The Snapshot only works if the moves happen.
 
-It was built on Antoine's Career Clarity Audit framework from your answers, and reviewed before it shipped.
+It was built from your answers on my Career Clarity Audit framework.
 
 If anything is unclear, just reply to this email.
 
-NxtGen Heights`,
+Antoine`,
     attachments: [
       {
         filename: `${params.clientName.replace(/\s+/g, '-')}-Career-Clarity-Snapshot.pdf`,

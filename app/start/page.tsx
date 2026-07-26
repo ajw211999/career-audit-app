@@ -40,9 +40,9 @@ export default function StartPage() {
     <main className="mx-auto max-w-lg px-6 py-16">
       <h1 className="text-2xl font-bold">Start your Career Clarity Snapshot</h1>
       <p className="mt-4 text-base leading-relaxed">
-        Enter the email you used at checkout and we will send you your personal
+        Enter the email you used at checkout and I will send you your personal
         intake link. The intake takes about 5 minutes, saves as you go, and your
-        Snapshot is delivered the same day you finish it.
+        Snapshot is usually in your inbox within a day of finishing it.
       </p>
       <form onSubmit={submit} className="mt-8 flex flex-col gap-3">
         <label htmlFor="email" className="text-sm font-medium">

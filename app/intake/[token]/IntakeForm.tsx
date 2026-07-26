@@ -149,9 +149,8 @@ export default function IntakeForm({
       <main className="mx-auto max-w-lg px-6 py-16">
         <h1 className="text-2xl font-bold">Done. Your Snapshot is being built.</h1>
         <p className="mt-4 leading-relaxed">
-          Your answers are in. The report gets a human review before it goes
-          out, so expect it in your inbox today. A confirmation email is on its
-          way to you now.
+          Your answers are in. Your report is usually in your inbox within a
+          day. A confirmation email is on its way to you now.
         </p>
       </main>
     );
@@ -216,7 +215,7 @@ export default function IntakeForm({
           </p>
         )}
         <p className="mt-4 text-center text-sm text-gray-500">
-          Delivered to your checkout email the same day.
+          Delivered to your checkout email, usually within a day.
         </p>
       </div>
     </main>
