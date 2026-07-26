@@ -21,10 +21,17 @@ function prepareCustomerContent(content: string): string {
   // paragraph(s), up to the first section heading.
   const noteIdx = out.indexOf(REVIEWER_NOTE_START);
   if (noteIdx !== -1) {
+    const head = out.slice(0, Math.max(0, out.lastIndexOf('**', noteIdx)));
     const sectionIdx = out.indexOf('## ', noteIdx);
-    out =
-      out.slice(0, Math.max(0, out.lastIndexOf('**', noteIdx))) +
-      (sectionIdx !== -1 ? out.slice(sectionIdx) : '');
+    if (sectionIdx !== -1) {
+      out = head + out.slice(sectionIdx);
+    } else {
+      // No section heading after the note (malformed generation). Cutting to
+      // end-of-content would email a blank PDF, so drop only the note's own
+      // paragraph block and let the length guard downstream decide.
+      const blockEnd = out.indexOf('\n\n', noteIdx);
+      out = head + (blockEnd !== -1 ? out.slice(blockEnd) : '');
+    }
   }
   out = out.replace(/^\*\*\[VOICE LINT FAILED[^\]]*\]\*\*\n*/i, '');
   out = out.replaceAll(
@@ -98,6 +105,31 @@ export async function POST(
     const customerContent = isSnapshot
       ? prepareCustomerContent(storedContent)
       : storedContent;
+
+    // Never email a gutted report: if stripping internal blocks ate the
+    // document, fail loudly and hand the row back for review.
+    if (
+      isSnapshot &&
+      (customerContent.length < 1200 ||
+        !customerContent.includes('## 1. Your Zone'))
+    ) {
+      console.error(
+        `Approve aborted for ${id}: stripped content looks incomplete ` +
+          `(${customerContent.length} chars of ${storedContent.length}).`
+      );
+      await supabase
+        .from('audits')
+        .update({ status: 'pending_review', approved_at: null })
+        .eq('id', id);
+      return NextResponse.json<ApiResponse<null>>(
+        {
+          success: false,
+          error:
+            'Report failed its pre-send integrity check and was not sent. Regenerate it.',
+        },
+        { status: 422 }
+      );
+    }
 
     const pdfBuffer = await generatePDF(
       customerContent,
